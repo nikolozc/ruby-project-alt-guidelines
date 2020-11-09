@@ -1,10 +1,11 @@
 require 'omdb'
 require 'omdb/api'
 require 'pry'
-@@client = Omdb::Api::Client.new(api_key: "7ec462bb")
+
 
 class CLI
 
+    @@client = Omdb::Api::Client.new(api_key: "7ec462bb")
     @@prompt = TTY::Prompt.new
     @@user = nil
 
@@ -23,14 +24,15 @@ class CLI
         username = @@prompt.ask("Please enter a username")
         password = @@prompt.mask("Please enter password (0-9)")
         if User.find_by(username: username, password: password)
+            system('clear')
             puts "Welcome back #{username}!"
-            sleep(5)
-            main_menu
+            sleep(1)
+            self.main_menu
         else
             system('clear')
             puts "User not found, taking you back to the welcome screen"
-            sleep(5)
-            welcome
+            sleep(1)
+            self.welcome
         end
     end
 
@@ -63,7 +65,17 @@ class CLI
         puts "Enter the movie you'd like to search for"
         movie_to_find = gets.chomp
         movies = @@client.find_by_title(movie_to_find)
-        @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
+        new_movie = Movie.create({title: movies.title})
+        selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
+        if selection == movies.title
+            rating = @@prompt.ask "What would you like to rate this movie? (0-5)"
+            puts "Thanks for rating this movie! Taking you home.."
+            Rating.create({user_id: @@user.id, movie_id: new_movie.id, rating: rating})
+            sleep(0.5)
+            main_menu
+        else
+            main_menu
+        end
     end
 
     def self.rated_movies
