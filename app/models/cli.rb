@@ -65,16 +65,23 @@ class CLI
         puts "Enter the movie you'd like to search for"
         movie_to_find = gets.chomp
         movies = @@client.find_by_title(movie_to_find)
-        new_movie = Movie.create({title: movies.title})
-        selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
-        if selection == movies.title
-            rating = @@prompt.ask "What would you like to rate this movie? (0-5)"
-            puts "Thanks for rating this movie! Taking you home.."
-            Rating.create({user_id: @@user.id, movie_id: new_movie.id, rating: rating})
-            sleep(0.5)
-            main_menu
+        binding.pry
+        if movies.response == "True"
+            new_movie = Movie.create({title: movies.title})
+            selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
+            if selection == movies.title
+                rating = @@prompt.ask "What would you like to rate this movie? (0-5)"
+                puts "Thanks for rating this movie! Taking you home.."
+                Rating.create({user_id: @@user, movie_id: new_movie, rating: rating})
+                sleep(0.5)
+                binding.pry
+                main_menu
+            else
+                main_menu
+            end
         else
-            main_menu
+            puts "movie not found, try again"
+            self.search_for_movie
         end
     end
 
