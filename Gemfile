@@ -8,3 +8,4 @@ gem "pry"
 gem "require_all"
 gem "faker"
 gem 'omdb'
+gem "tty-prompt"
