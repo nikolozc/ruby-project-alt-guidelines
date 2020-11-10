@@ -75,15 +75,18 @@ class CLI
     def search_for_movie
         puts "Enter the movie you'd like to search for"
         movie_to_find = gets.chomp
-        if Movie.all.include?(movie_to_find)
-            movies = Movie.all.select{|movie|movie.title.include?(movie_to_find)}
-            selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
+        movies = Movie.all.select{|movie|movie.title.include?(movie_to_find)}
+        binding.pry
+        if !movies.empty?
+            selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.map{|movie|movie.title}))
             puts "What is the rating for this movie? (Ratings are scaled 1-5)"
             rating = gets.chomp
+            rating = rating.to_i
             while(rating < 1 || rating > 5) do
                 puts "Invalid choice, please enter a number 1-5"
                 rating = gets.chomp
             end
+            selection = Movie.find_by_title(selection)
             Rating.create({user: @@user, movie: selection, rating: rating})
             puts "Your movie has been added to your list of Rated Movies"
             sleep (0.5)
