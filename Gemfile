@@ -10,3 +10,4 @@ gem "faker"
 gem 'omdb'
 gem "tty-prompt"
 gem 'omdb-api'
+gem "rake"

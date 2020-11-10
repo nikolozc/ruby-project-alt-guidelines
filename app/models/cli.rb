@@ -46,7 +46,7 @@ class CLI
     end
     
     def main_menu
-        puts "Welcome to -------!"
+        puts "Welcome to miMovie!"
         choices = ["Search for a movie to review", "See what movies you have rated already", "Browse a list of movies","Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
         case selection
@@ -61,32 +61,24 @@ class CLI
         end
     end
 
+    @@rated_movies = []
+
     def search_for_movie
         puts "Enter the movie you'd like to search for"
         movie_to_find = gets.chomp
-        movies = @@client.find_by_title(movie_to_find)
-        binding.pry
-        if movies.response == "True"
-            new_movie = Movie.create({title: movies.title})
-            selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
-            if selection == movies.title
-                rating = @@prompt.ask "What would you like to rate this movie? (0-5)"
-                puts "Thanks for rating this movie! Taking you home.."
-                Rating.create({user_id: @@user, movie_id: new_movie, rating: rating})
-                sleep(0.5)
-                binding.pry
-                main_menu
-            else
-                main_menu
-            end
-        else
-            puts "movie not found, try again"
-            self.search_for_movie
-        end
+        movies = http://www.omdbapi.com/?apikey="7ec462bb"&s=movie_to_find
+        selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
+        @@rated_movies << movies.title
+        puts "Your movie has been added to your list of Rated Movies"
+        sleep (0.5)
+        puts "Taking you back to the main menu.."
+        main_menu
     end
 
-    def self.rated_movies
-        @@user.movies
+    def rated_movies
+        puts "Here are the movies you have rated already"
+        sleep(1)
+        selection = @@prompt.select("Please choose which movies rating you'd like to update", (@@rated_movies))
     end
 
     def self.movie_list
@@ -95,7 +87,7 @@ class CLI
 
     def logout
         puts "Thanks for logging in! See you next time!"
-        sleep(1)
+        sleep(5)
         @@user = nil
         welcome
     end
