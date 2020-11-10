@@ -163,12 +163,10 @@ class CLI
             selection = selection.split(" - ", 2)
             movie = Movie.find_by_title(selection[0])
             Rating.all.find_by(user: @@user,movie: movie).destroy
-            #@@user.movies.find(movie.id).destroy
             puts "This movie and its rating have been deleted from your account"
             sleep(1)
             puts "Taking you back to the main menu.."
             sleep(2)
-            #binding.pry
             main_menu
         else 
             puts "You haven't rated any movies yet"
@@ -181,9 +179,28 @@ class CLI
 
     def random_movie
         array = Movie.all.map{|movie|movie.id}
-        random = rand(0..array.count)
-        puts Movie.find(array[random]).title
-        #selection = @@prompt.select("What would you like to do today?", choices)
+        random = rand(0...array.count)
+        movie = Movie.find(array[random])
+        if @@user.movies.include? movie
+            self.random_movie
+        else 
+            puts movie.title
+            selection = @@prompt.select("Would you like to rate this movie?", %w(YES NO))
+            case selection
+            when "YES"
+                puts "What is the rating for this movie? (Ratings are scaled 1-5)"
+                rating = rate()
+                Rating.create({user: @@user, movie: movie, rating: rating})
+                puts "Your movie has been added to your list of Rated Movies"
+                sleep (0.5)
+                puts "Taking you back to the main menu.."
+                main_menu
+            when "NO"
+                puts "Taking you back to the main menu.."
+                sleep (0.5)
+                main_menu
+            end
+        end
     end
 
     def logout
