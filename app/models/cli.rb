@@ -61,14 +61,17 @@ class CLI
         end
     end
 
-    @@rated_movies = []
+    @@rated_movies = {}
 
     def search_for_movie
         puts "Enter the movie you'd like to search for"
         movie_to_find = gets.chomp
-        movies = http://www.omdbapi.com/?apikey="7ec462bb"&s=movie_to_find
-        selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.title))
-        @@rated_movies << movies.title
+        movies = @@client.find_by_title(movie_to_find)
+        movie_title = movies.title
+        selection = @@prompt.select("Please choose which movie you'd like to rate", (movie_title))
+        puts "What is the rating for this movie? (Ratings are scaled 1-5)"
+        rating = gets.chomp
+        @@rated_movies[movie_title] = rating
         puts "Your movie has been added to your list of Rated Movies"
         sleep (0.5)
         puts "Taking you back to the main menu.."
@@ -79,6 +82,12 @@ class CLI
         puts "Here are the movies you have rated already"
         sleep(1)
         selection = @@prompt.select("Please choose which movies rating you'd like to update", (@@rated_movies))
+        puts "What is the new rating for this movie?"
+        rating = gets.chomp
+        puts "The rating for this movie has been updated!"
+        sleep (0.5)
+        puts "Taking you back to the main menu.."
+        main_menu
     end
 
     def self.movie_list
