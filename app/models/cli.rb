@@ -91,7 +91,7 @@ class CLI
     end
 
     def self.movie_list
-        movies.title
+        
     end
 
     def logout
