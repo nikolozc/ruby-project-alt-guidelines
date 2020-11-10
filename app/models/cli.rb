@@ -67,6 +67,7 @@ class CLI
 
     def main_menu
         system('clear')
+        @@user.reload
         puts "Welcome to miMovie!"
         choices = ["Search for a movie to review", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
@@ -153,7 +154,6 @@ class CLI
     end
 
     def delete_rating
-        binding.pry
         if !@@user.movies.empty?
             puts "Which rating(s) would you like to delete?"
             rated_movies = @@user.movies.map do |movie| 
