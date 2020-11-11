@@ -24,48 +24,45 @@ class CLI
         display_menu = @@prompt.select("Welcome! Please Log In or Signup.", %w(Login Signup))
         case display_menu
         when "Login"
-            @@user = User.second
-            self.main_menu
+            self.login
         when "Signup"
             self.signup
         end
     end
 
-    #def login
-     #   username = @@prompt.ask("Please enter a username")
-      #  password = @@prompt.mask("Please enter password (0-9)")
-       # if user = User.find_by(username: username, password: password)
-        #    @@user = user
-            #@@spinner.auto_spin
-           # @@spinner.stop("Done!")
-         #   system('clear')
-          #  puts "Welcome back #{username}!"
-           # sleep(1)
-            #self.main_menu
-        #else
-         #   system('clear')
-          #  puts "User not found, taking you back to the welcome screen"
-           # sleep(1)
-            #self.welcome
-        #end
-    #end
+    def login
+        system('clear')
+        logo
+        username = @@prompt.ask("Please enter a username")
+        password = @@prompt.mask("Please enter password (0-9)")
+        if user = User.find_by(username: username, password: password)
+            @@user = user
+            spinner
+            puts "Welcome back #{username}!"
+            sleep(1)
+            self.main_menu
+        else
+            system('clear')
+            spinner
+            puts "User not found, taking you back to the welcome screen"
+            sleep(1)
+            self.welcome
+        end
+    end
 
     def signup
+        logo
         username = @@prompt.ask("Please enter a username")
         password = @@prompt.mask("Please enter password (0-9)")
          if username = User.find_by(username: username)
-            @@spinner.auto_spin
-            sleep(2)
-            @@spinner.stop("Done!")
+            spinner
             puts "This User already exists, please login if this is you or choose a different username"
             sleep(1)
             welcome
          else
             new_user = User.create(username: username, password: password)
             @@user = new_user
-            @@spinner.auto_spin
-            sleep(2)
-            @@spinner.stop("Done!")
+            spinner
             puts "Welcome and thanks for joining!"
             sleep(1)
             self.main_menu
@@ -89,7 +86,8 @@ class CLI
             self.delete_rating
         when "See a random movie"
              self.random_movie
-        when 
+        when "DELETE ALL RATINGS"
+            self.delete_all_ratings
         when "Logout"
             self.logout
         end
@@ -97,13 +95,11 @@ class CLI
 
     def search_for_movie
         puts "Enter the movie you'd like to search for"
-        movie_to_find = gets.chomp
-        movies = Movie.all.select{|movie|movie.title.include?(movie_to_find)}
-        if !movies.empty?
-            @@spinner.auto_spin
-            sleep(2)
-            @@spinner.stop("Done!")
+        movie_to_find = gets.chomp.capitalize
+        movies = Movie.all.select{|movie|movie.title.capitalize.include?(movie_to_find)}
+        if !movies.empty? && movie_to_find != ""
             system('clear')
+            spinner
             puts @@pastel.cyan("Please choose which movie you'd like to rate")
             selection = @@prompt.select("(Don't see the movie you're looking for? Add it to our list from the main menu!)", (movies.map{|movie|movie.title}), per_page: 10)
             selection = Movie.find_by_title(selection)
@@ -135,6 +131,7 @@ class CLI
                 end
             end
         else
+            spinner
             puts "No movies found by that title, try again"
             self.search_for_movie
         end
@@ -151,14 +148,13 @@ class CLI
             if !Movie.all.any?{|movie| movie.title == movie}
                 new_movie = Movie.create(title: movie)
                 Rating.create(user: @@user, movie: new_movie, rating: rating)
-                @@spinner.auto_spin
-                sleep(2)
-                @@spinner.stop
+                spinner
                 puts "Your entry has been added! Thanks for your contribution."
                 puts "Taking you back to the main menu.."
                 sleep (2)
                 main_menu
             else
+                spinner
                 puts "This movie already exists in our list, please use search function"
                 puts "Taking you back to the main menu"
                 sleep(2)
@@ -171,7 +167,7 @@ class CLI
             create_movie
         when "Menu"
             puts "Taking you back to the main menu.."
-            sleep(1)
+            spinner
             main_menu
         end
     end
@@ -179,13 +175,14 @@ class CLI
     def rated_movies
         if !@@user.movies.empty?
             puts "Here are the movies you have rated already"
-            sleep(1)
+            spinner
             rated_movies = @@user.movies.map do |movie| 
                 "#{movie.title} - rated #{movie.ratings.find_by(user: @@user, movie: movie).rating}"
             end
             rated_movies << "back"
             selection = @@prompt.select("Please choose which movies rating you'd like to update", (rated_movies))
             if selection == "back"
+                spinner
                 main_menu
             else
                 selection = selection.split(" - " , 2)
@@ -193,6 +190,7 @@ class CLI
                 rating = rate()
                 movie = Movie.all.find_by_title(selection[0])
                 Rating.all.find_by(user: @@user,movie: movie).update(rating: rating)
+                spinner
                 puts "The rating for this movie has been updated!"
                 sleep (2)
                 puts "Taking you back to the main menu.."
@@ -200,6 +198,7 @@ class CLI
                 main_menu
             end
         else @@user.movies.empty?
+            spinner
             puts "You have not rated any movies yet."
             sleep (2)
             puts "Taking you back to the main menu.."
@@ -211,7 +210,7 @@ class CLI
     def delete_rating
         if !@@user.movies.empty?
             puts @@pastel.red("Which rating(s) would you like to delete?")
-            rated_movies = @@user.movies.map do |movie| 
+            rated_movies = @@user.movies.map do |movie|
                 "#{movie.title} - rated #{movie.ratings.find_by(user: @@user, movie: movie).rating}"
             end
             rated_movies << "back"
@@ -222,6 +221,7 @@ class CLI
                 selection = selection.split(" - ", 2)
                 movie = Movie.find_by_title(selection[0])
                 Rating.all.find_by(user: @@user, movie: movie).destroy
+                spinner
                 puts "This movie and its rating have been deleted from your account"
                 sleep(1)
                 puts "Taking you back to the main menu.."
@@ -229,6 +229,7 @@ class CLI
                 main_menu
             end
         else
+            spinner
             puts "You haven't rated any movies yet"
             sleep (2)
             puts "Taking you back to the main menu.."
@@ -244,6 +245,7 @@ class CLI
         if @@user.movies.include? movie
             self.random_movie
         else 
+            spinner
             puts movie.title
             selection = @@prompt.select("Would you like to rate this movie?", %w(Yes No))
             case selection
@@ -251,6 +253,7 @@ class CLI
                 puts "What is the rating for this movie? (Ratings are scaled 1-5)"
                 rating = rate()
                 Rating.create({user: @@user, movie: movie, rating: rating})
+                spinner
                 puts "Your movie has been added to your list of Rated Movies"
                 sleep (1)
                 puts "Taking you back to the main menu.."
@@ -261,6 +264,31 @@ class CLI
                 main_menu
             end
         end
+    end
+
+    def delete_all_ratings
+        puts @@pastel.red("THIS IS THE DANGER ZONE")
+        selection = @@prompt.select("Are you sure you'd like to delete ALL ratings?", %w(Yes No))
+            if selection == "Yes"
+                choice = @@prompt.select("Are you DEFINITELY SURE?", %w(Yes No))
+                if choice == "Yes"
+                    @@user.ratings.destroy_all
+                    spinner
+                    puts "All ratings have been deleted."
+                    puts "Taking you back to the main menu to create some more!"
+                    sleep(2)
+                    main_menu
+                else choice == "No"
+                    puts "Whew, that was close!"
+                    puts "Taking you back to the main menu.."
+                    sleep(2)
+                    main_menu
+                end
+            else selection == "No"
+                puts "OK. Taking you back to the main menu.."
+                sleep(2)
+                main_menu
+            end
     end
 
     def logout
@@ -277,6 +305,12 @@ class CLI
             rating = gets.chomp.to_i
         end
         return rating
+    end
+
+    def spinner
+        @@spinner.auto_spin
+        sleep(2)
+        @@spinner.stop("Done!")
     end
 
 end
