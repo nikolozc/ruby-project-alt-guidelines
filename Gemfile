@@ -13,3 +13,5 @@ gem 'omdb-api'
 gem "rake"
 gem 'artii'
 gem "tty-spinner"
+gem "pastel"
+gem 'tty-font'

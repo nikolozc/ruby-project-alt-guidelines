@@ -10,13 +10,15 @@ class CLI
     @@artii = Artii::Base.new :font => 'slant'
     @@user = nil
     @@spinner = TTY::Spinner.new
+    @@pastel = Pastel.new
+    @@font = TTY::Font.new("3d")
 
     def logo
-       puts @@artii.asciify("Welcome to")
-       puts @@artii.asciify("miMovie!")
+        puts @@pastel.cyan(@@font.write('miMovie'))
     end
 
     def welcome
+        system('clear')
         logo
         sleep(2)
         system('clear')
@@ -66,7 +68,7 @@ class CLI
     def main_menu
         system('clear')
         @@user.reload
-        puts "Welcome to miMovie!"
+        puts "Hi there! Please choose from one of the following options"
         choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
         case selection
@@ -130,12 +132,25 @@ class CLI
         movie = gets.chomp.to_s
         puts "And what would you like to rate this movie?(1-5)"
         rating = gets.chomp.to_i
-        new_movie = Movie.create(title: movie)
-        new_rating = Rating.create(user: @@user, movie: new_movie, rating: rating)
-        puts "Your entry has been added! Thanks for your contribution."
-        puts "Taking you back to the main menu.."
-        sleep (1)
-        main_menu
+        choice = @@prompt.select("Are you sure?", %w(Yes No Menu))
+        case choice
+        when "Yes"
+            new_movie = Movie.create(title: movie)
+            new_rating = Rating.create(user: @@user, movie: new_movie, rating: rating)
+            puts "Your entry has been added! Thanks for your contribution."
+            puts "Taking you back to the main menu.."
+            sleep (2)
+            main_menu
+        when "No"
+            puts "Lets try that again.."
+            sleep(2)
+            system('clear')
+            create_movie
+        when "Menu"
+            puts "Taking you back to the main menu.."
+            sleep(1)
+            main_menu
+        end
     end
 
     def rated_movies
@@ -172,10 +187,10 @@ class CLI
 
     def delete_rating
         if !@@user.movies.empty?
-            puts "Which rating(s) would you like to delete?"
+            puts @@pastel.red("Which rating(s) would you like to delete?")
             rated_movies = @@user.movies.map do |movie| 
                 "#{movie.title} - rated #{movie.ratings.find_by(user: @@user, movie: movie).rating}"
-             end
+            end
             rated_movies << "back"
             selection = @@prompt.select("Please choose which movies rating you'd like to delete", rated_movies)
             if selection == "back"
@@ -229,7 +244,7 @@ class CLI
         puts "Thanks for logging in! See you next time!"
         sleep(5)
         @@user = nil
-        welcome
+        system('exit')
     end
 
     def rate()
