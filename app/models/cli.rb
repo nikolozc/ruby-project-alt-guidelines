@@ -145,17 +145,22 @@ class CLI
             rated_movies = @@user.movies.map do |movie| 
                 "#{movie.title} - rated #{movie.ratings.find_by(user: @@user, movie: movie).rating}"
             end
+            rated_movies << "back"
             selection = @@prompt.select("Please choose which movies rating you'd like to update", (rated_movies))
-            selection = selection.split(" - " , 2)
-            puts "What is the new rating for this movie?"
-            rating = rate()
-            movie = Movie.all.find_by_title(selection[0])
-            Rating.all.find_by(user: @@user,movie: movie).update(rating: rating)
-            puts "The rating for this movie has been updated!"
-            sleep (2)
-            puts "Taking you back to the main menu.."
-            sleep(2)
-            main_menu
+            if selection == "back"
+                main_menu
+            else
+                selection = selection.split(" - " , 2)
+                puts "What is the new rating for this movie?"
+                rating = rate()
+                movie = Movie.all.find_by_title(selection[0])
+                Rating.all.find_by(user: @@user,movie: movie).update(rating: rating)
+                puts "The rating for this movie has been updated!"
+                sleep (2)
+                puts "Taking you back to the main menu.."
+                sleep(2)
+                main_menu
+            end
         else @@user.movies.empty?
             puts "You have not rated any movies yet."
             sleep (2)
