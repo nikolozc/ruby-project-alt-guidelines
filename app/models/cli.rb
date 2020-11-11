@@ -100,7 +100,7 @@ class CLI
                 sleep (0.5)
                 puts "Taking you back to the main menu.."
                 main_menu
-            else 
+            else
                 puts "You have already rated this movie"
                 choice = @@prompt.select("Would you like to update your rating?", %w(Yes No))
                 case choice
@@ -176,16 +176,21 @@ class CLI
             rated_movies = @@user.movies.map do |movie| 
                 "#{movie.title} - rated #{movie.ratings.find_by(user: @@user, movie: movie).rating}"
              end
+            rated_movies << "back"
             selection = @@prompt.select("Please choose which movies rating you'd like to delete", rated_movies)
-            selection = selection.split(" - ", 2)
-            movie = Movie.find_by_title(selection[0])
-            Rating.all.find_by(user: @@user,movie: movie).destroy
-            puts "This movie and its rating have been deleted from your account"
-            sleep(1)
-            puts "Taking you back to the main menu.."
-            sleep(2)
-            main_menu
-        else 
+            if selection == "back"
+                main_menu
+            else
+                selection = selection.split(" - ", 2)
+                movie = Movie.find_by_title(selection[0])
+                Rating.all.find_by(user: @@user,movie: movie).destroy
+                puts "This movie and its rating have been deleted from your account"
+                sleep(1)
+                puts "Taking you back to the main menu.."
+                sleep(2)
+                main_menu
+            end
+        else
             puts "You haven't rated any movies yet"
             sleep (2)
             puts "Taking you back to the main menu.."
