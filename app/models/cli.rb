@@ -74,6 +74,7 @@ class CLI
 
     def main_menu
         system('clear')
+        logo
         @@user.reload
         choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
@@ -142,13 +143,16 @@ class CLI
         puts "What is the name of the movie you would like to create?"
         movie = gets.chomp.to_s
         puts "And what would you like to rate this movie?(1-5)"
-        rating = gets.chomp.to_i
+        rating = rate()
         choice = @@prompt.select("Are you sure?", %w(Yes No Menu))
         case choice
         when "Yes"
-            if !@@user.movies.any?{|movie| movie.title == movie}
+            if !Movie.all.any?{|movie| movie.title == movie}
                 new_movie = Movie.create(title: movie)
-                new_rating = Rating.create(user: @@user, movie: new_movie, rating: rating)
+                Rating.create(user: @@user, movie: new_movie, rating: rating)
+                @@spinner.auto_spin
+                sleep(2)
+                @@spinner.stop
                 puts "Your entry has been added! Thanks for your contribution."
                 puts "Taking you back to the main menu.."
                 sleep (2)
@@ -216,7 +220,7 @@ class CLI
             else
                 selection = selection.split(" - ", 2)
                 movie = Movie.find_by_title(selection[0])
-                Rating.all.find_by(user: @@user,movie: movie).destroy
+                Rating.all.find_by(user: @@user, movie: movie).destroy
                 puts "This movie and its rating have been deleted from your account"
                 sleep(1)
                 puts "Taking you back to the main menu.."
