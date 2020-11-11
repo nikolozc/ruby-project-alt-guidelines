@@ -9,7 +9,7 @@ class CLI
     @@prompt = TTY::Prompt.new
     @@artii = Artii::Base.new :font => 'slant'
     @@user = nil
-    @@spinner = TTY::Spinner.new
+    @@spinner = TTY::Spinner.new("[:spinner] Loading ...", format: :pulse_2)
     @@pastel = Pastel.new
     @@font = TTY::Font.new("3d")
 
@@ -20,8 +20,7 @@ class CLI
     def welcome
         system('clear')
         logo
-        sleep(2)
-        system('clear')
+        #sleep(2)
         display_menu = @@prompt.select("Welcome! Please Log In or Signup.", %w(Login Signup))
         case display_menu
         when "Login"
@@ -37,6 +36,8 @@ class CLI
       #  password = @@prompt.mask("Please enter password (0-9)")
        # if user = User.find_by(username: username, password: password)
         #    @@user = user
+            #@@spinner.auto_spin
+           # @@spinner.stop("Done!")
          #   system('clear')
           #  puts "Welcome back #{username}!"
            # sleep(1)
@@ -53,12 +54,18 @@ class CLI
         username = @@prompt.ask("Please enter a username")
         password = @@prompt.mask("Please enter password (0-9)")
          if username = User.find_by(username: username)
+            @@spinner.auto_spin
+            sleep(2)
+            @@spinner.stop("Done!")
             puts "This User already exists, please login if this is you or choose a different username"
             sleep(1)
             welcome
          else
             new_user = User.create(username: username, password: password)
             @@user = new_user
+            @@spinner.auto_spin
+            sleep(2)
+            @@spinner.stop("Done!")
             puts "Welcome and thanks for joining!"
             sleep(1)
             self.main_menu
@@ -68,7 +75,6 @@ class CLI
     def main_menu
         system('clear')
         @@user.reload
-        puts "Hi there! Please choose from one of the following options"
         choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
         case selection
@@ -92,7 +98,12 @@ class CLI
         movie_to_find = gets.chomp
         movies = Movie.all.select{|movie|movie.title.include?(movie_to_find)}
         if !movies.empty?
-            selection = @@prompt.select("Please choose which movie you'd like to rate", (movies.map{|movie|movie.title}), per_page: 10)
+            @@spinner.auto_spin
+            sleep(2)
+            @@spinner.stop("Done!")
+            system('clear')
+            puts @@pastel.cyan("Please choose which movie you'd like to rate")
+            selection = @@prompt.select("(Don't see the movie you're looking for? Add it to our list from the main menu!)", (movies.map{|movie|movie.title}), per_page: 10)
             selection = Movie.find_by_title(selection)
             if !@@user.ratings.any?{|rating| rating.movie == selection}
                 puts "What is the rating for this movie? (Ratings are scaled 1-5)"
@@ -135,12 +146,19 @@ class CLI
         choice = @@prompt.select("Are you sure?", %w(Yes No Menu))
         case choice
         when "Yes"
-            new_movie = Movie.create(title: movie)
-            new_rating = Rating.create(user: @@user, movie: new_movie, rating: rating)
-            puts "Your entry has been added! Thanks for your contribution."
-            puts "Taking you back to the main menu.."
-            sleep (2)
-            main_menu
+            if !@@user.movies.any?{|movie| movie.title == movie}
+                new_movie = Movie.create(title: movie)
+                new_rating = Rating.create(user: @@user, movie: new_movie, rating: rating)
+                puts "Your entry has been added! Thanks for your contribution."
+                puts "Taking you back to the main menu.."
+                sleep (2)
+                main_menu
+            else
+                puts "This movie already exists in our list, please use search function"
+                puts "Taking you back to the main menu"
+                sleep(2)
+                main_menu
+            end
         when "No"
             puts "Lets try that again.."
             sleep(2)
