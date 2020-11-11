@@ -21,8 +21,30 @@ Movie.create([
     {title: "Back to the Future", release_date: "July 3rd, 1985"},
     {title: "Back to the Future: Part II", release_date: "November 22nd, 1989"},
     {title: "Frozen 2", release_date: "November 22nd, 2019"},
-
-])
+    {title: "Legally Blonde", release_date: "July 13th, 2001"},
+    {title: "Nightcrawler", release_date: "October 31st, 2014"},
+    {title: "Snowpiercer", release_date: "July 29th, 2013"},
+    {title: "Deadpool", release_date: ""},
+    {title: "10 Things I Hate About You", release_date: "March 31st, 1999"},
+    {title: "Oblivion", release_date: "April 19th, 2013"},
+    {title: "13 Going on 30", release_date: "April 23rd, 2004"},
+    {title: "Disclosure", release_date: "January 27th, 2020"},
+    {title: "The Rocky Horror Picture Show", release_date: "September 25th, 1975"},
+    {title: "Flower", release_date: "March 16th, 2018"},
+    {title: "Hairspray", release_date: "July 20th, 2007"},
+    {title: "Hulk", release_date: "June 17th, 2003"},
+    {title: "Mean Girls", release_date: "April 30th, 2004"},
+    {title: "Chappie", release_date: "March 6th, 2015"},
+    {title: "Rent", release_date: "November 23rd, 2005"},
+    {title: "SpiderMan", release_date: "May 4th, 2007"},
+    {title: "The Devil Wears Prada", release_date: "June 30th, 2006"},
+    {title: "The Ritual", release_date: "October 13th, 2017"},
+    {title: "Lolita", release_date: "June 13th, 1962"},
+    {title: "Clueless", release_date: "July 19th, 1995"},
+    {title: "Divergent", release_date: "March 21st, 2014"},
+    {title: "Pitch Perfect", release_date: "September 28th, 2012"},
+    {title: "The Game", release_date: "September 12th, 1997"},
+    ])
 
 
 m1 = Movie.first

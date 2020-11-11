@@ -12,3 +12,4 @@ gem "tty-prompt"
 gem 'omdb-api'
 gem "rake"
 gem 'artii'
+gem "tty-spinner"

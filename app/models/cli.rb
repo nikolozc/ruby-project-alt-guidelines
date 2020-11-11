@@ -9,18 +9,16 @@ class CLI
     @@prompt = TTY::Prompt.new
     @@artii = Artii::Base.new :font => 'slant'
     @@user = nil
+    @@spinner = TTY::Spinner.new
 
     def logo
        puts @@artii.asciify("Welcome to")
        puts @@artii.asciify("miMovie!")
     end
-    
-    def display_logo
-        logo
-    end
 
     def welcome
-        sleep(1)
+        logo
+        sleep(2)
         system('clear')
         display_menu = @@prompt.select("Welcome! Please Log In or Signup.", %w(Login Signup))
         case display_menu
@@ -69,11 +67,13 @@ class CLI
         system('clear')
         @@user.reload
         puts "Welcome to miMovie!"
-        choices = ["Search for a movie to review", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
+        choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
         case selection
         when "Search for a movie to review"
             self.search_for_movie
+        when "Add a movie to our list"
+            self.create_movie
         when "See what movies you have rated already"
             self.rated_movies
         when "Delete Rating(s)"
@@ -123,7 +123,19 @@ class CLI
             puts "No movies found by that title, try again"
             self.search_for_movie
         end
+    end
 
+    def create_movie
+        puts "What is the name of the movie you would like to create?"
+        movie = gets.chomp.to_s
+        puts "And what would you like to rate this movie?(1-5)"
+        rating = gets.chomp.to_i
+        new_movie = Movie.create(title: movie)
+        new_rating = Rating.create(user: @@user, movie: new_movie, rating: rating)
+        puts "Your entry has been added! Thanks for your contribution."
+        puts "Taking you back to the main menu.."
+        sleep (1)
+        main_menu
     end
 
     def rated_movies
@@ -185,19 +197,19 @@ class CLI
             self.random_movie
         else 
             puts movie.title
-            selection = @@prompt.select("Would you like to rate this movie?", %w(YES NO))
+            selection = @@prompt.select("Would you like to rate this movie?", %w(Yes No))
             case selection
             when "YES"
                 puts "What is the rating for this movie? (Ratings are scaled 1-5)"
                 rating = rate()
                 Rating.create({user: @@user, movie: movie, rating: rating})
                 puts "Your movie has been added to your list of Rated Movies"
-                sleep (0.5)
+                sleep (1)
                 puts "Taking you back to the main menu.."
                 main_menu
             when "NO"
                 puts "Taking you back to the main menu.."
-                sleep (0.5)
+                sleep (1)
                 main_menu
             end
         end

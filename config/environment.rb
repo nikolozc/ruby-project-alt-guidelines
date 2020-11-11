@@ -8,4 +8,4 @@ require_all 'app/models'
 require_all 'db/migrate'
 
 #Uncomment bottom line after done with project
-#ActiveRecord::Base.logger = nil
+ActiveRecord::Base.logger = nil

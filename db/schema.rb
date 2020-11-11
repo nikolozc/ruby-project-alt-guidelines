@@ -14,7 +14,7 @@ ActiveRecord::Schema.define(version: 2020_11_09_192801) do
 
   create_table "movies", force: :cascade do |t|
     t.string "title"
-    t.datetime "release_date"
+    t.string "release_date"
   end
 
   create_table "ratings", force: :cascade do |t|
