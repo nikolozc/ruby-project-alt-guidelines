@@ -76,7 +76,7 @@ class CLI
         system('clear')
         logo
         @@user.reload
-        choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "Logout"]
+        choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "DELETE ALL RATINGS", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
         case selection
         when "Search for a movie to review"
@@ -88,7 +88,8 @@ class CLI
         when "Delete Rating(s)"
             self.delete_rating
         when "See a random movie"
-            self.random_movie
+             self.random_movie
+        when 
         when "Logout"
             self.logout
         end
@@ -246,7 +247,7 @@ class CLI
             puts movie.title
             selection = @@prompt.select("Would you like to rate this movie?", %w(Yes No))
             case selection
-            when "YES"
+            when "Yes"
                 puts "What is the rating for this movie? (Ratings are scaled 1-5)"
                 rating = rate()
                 Rating.create({user: @@user, movie: movie, rating: rating})
@@ -254,7 +255,7 @@ class CLI
                 sleep (1)
                 puts "Taking you back to the main menu.."
                 main_menu
-            when "NO"
+            when "No"
                 puts "Taking you back to the main menu.."
                 sleep (1)
                 main_menu
