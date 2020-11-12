@@ -1,13 +1,8 @@
-#require 'omdb'
-#require 'omdb/api'
 require 'pry'
 
 
 class CLI
-
-    #@@client = Omdb::Api::Client.new(api_key: "7ec462bb")
     @@prompt = TTY::Prompt.new
-    #@@artii = Artii::Base.new :font => 'slant'
     @@user = nil
     @@spinner = TTY::Spinner.new("[:spinner] Loading ...", format: :pulse_2)
     @@pastel = Pastel.new
@@ -20,7 +15,6 @@ class CLI
     def welcome
         system('clear')
         logo
-        #binding.pry
         display_menu = @@prompt.select("Welcome! Please Log In or Signup.", %w(Login Signup))
         case display_menu
         when "Login"
@@ -52,7 +46,7 @@ class CLI
     def signup
         system('clear')
         logo
-        username = @@prompt.ask("Please enter a username").capitalize
+        username = @@prompt.ask("Please enter a username").strip.capitalize
         password = @@prompt.mask("Please enter password (0-9)")
          if user = User.find_by(username: username)
             spinner
