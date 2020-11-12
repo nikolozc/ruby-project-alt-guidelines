@@ -44,7 +44,7 @@ class CLI
         else
             spinner
             puts "User not found, taking you back to the welcome screen"
-            sleep(1)
+            sleep(2)
             self.welcome
         end
     end
@@ -52,16 +52,16 @@ class CLI
     def signup
         system('clear')
         logo
-        username = @@prompt.ask("Please enter a username")
+        username = @@prompt.ask("Please enter a username").capitalize
         password = @@prompt.mask("Please enter password (0-9)")
-         if username = User.find_by(username: username)
+         if user = User.find_by(username: username)
             spinner
             puts "This User already exists, please login if this is you or choose a different username"
-            sleep(1)
+            sleep(2)
             welcome
-         else
-            new_user = User.create(username: username, password: password)
-            @@user = new_user
+         else user != User.find_by(username: username)
+            @@user = user
+            @@user = User.create(username: @username, password: password)
             spinner
             puts "Welcome #{username} and thanks for joining!"
             sleep(2)
@@ -205,7 +205,7 @@ class CLI
             spinner
             puts "You have not rated any movies yet."
             sleep (2)
-            puts "Taking you back to the main menu.."
+            puts "Taking you back to the main menu so you can rate some.."
             sleep(2)
             main_menu
         end
