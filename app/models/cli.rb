@@ -1,5 +1,5 @@
-require 'omdb'
-require 'omdb/api'
+#require 'omdb'
+#require 'omdb/api'
 require 'pry'
 
 
@@ -7,7 +7,7 @@ class CLI
 
     #@@client = Omdb::Api::Client.new(api_key: "7ec462bb")
     @@prompt = TTY::Prompt.new
-    @@artii = Artii::Base.new :font => 'slant'
+    #@@artii = Artii::Base.new :font => 'slant'
     @@user = nil
     @@spinner = TTY::Spinner.new("[:spinner] Loading ...", format: :pulse_2)
     @@pastel = Pastel.new
@@ -39,7 +39,7 @@ class CLI
             @@user = user
             spinner
             puts "Welcome back #{username}!"
-            sleep(1)
+            sleep(2)
             self.main_menu
         else
             spinner
@@ -63,8 +63,8 @@ class CLI
             new_user = User.create(username: username, password: password)
             @@user = new_user
             spinner
-            puts "Welcome and thanks for joining!"
-            sleep(1)
+            puts "Welcome #{username} and thanks for joining!"
+            sleep(2)
             self.main_menu
          end
     end
@@ -109,7 +109,7 @@ class CLI
                 rating = rate()
                 Rating.create({user: @@user, movie: selection, rating: rating})
                 puts "Your movie has been added to your list of Rated Movies"
-                sleep (0.5)
+                sleep (2)
                 puts "Taking you back to the main menu.."
                 main_menu
             else
@@ -127,7 +127,7 @@ class CLI
                     main_menu
                 when "No"
                     puts "Taking you back to the main menu.."
-                    sleep (1)
+                    sleep (2)
                     main_menu
                 end
             end
@@ -248,7 +248,7 @@ class CLI
         movie = Movie.find(array[random])
         if @@user.movies.include? movie
             self.random_movie
-        else 
+        else
             spinner
             puts movie.title
             selection = @@prompt.select("Would you like to rate this movie?", %w(Yes No))
