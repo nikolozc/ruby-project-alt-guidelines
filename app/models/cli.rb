@@ -33,7 +33,7 @@ class CLI
     def login
         system('clear')
         logo
-        username = @@prompt.ask("Please enter a username")
+        username = @@prompt.ask("Please enter a username").capitalize
         password = @@prompt.mask("Please enter password (0-9)")
         if user = User.find_by(username: username, password: password)
             @@user = user
@@ -42,7 +42,6 @@ class CLI
             sleep(1)
             self.main_menu
         else
-            system('clear')
             spinner
             puts "User not found, taking you back to the welcome screen"
             sleep(1)
@@ -51,6 +50,7 @@ class CLI
     end
 
     def signup
+        system('clear')
         logo
         username = @@prompt.ask("Please enter a username")
         password = @@prompt.mask("Please enter password (0-9)")
@@ -94,11 +94,12 @@ class CLI
     end
 
     def search_for_movie
+        system('clear')
+        logo
         puts "Enter the movie you'd like to search for"
         movie_to_find = gets.chomp.capitalize
         movies = Movie.all.select{|movie|movie.title.capitalize.include?(movie_to_find)}
         if !movies.empty? && movie_to_find != ""
-            system('clear')
             spinner
             puts @@pastel.cyan("Please choose which movie you'd like to rate")
             selection = @@prompt.select("(Don't see the movie you're looking for? Add it to our list from the main menu!)", (movies.map{|movie|movie.title}), per_page: 10)
@@ -133,19 +134,20 @@ class CLI
         else
             spinner
             puts "No movies found by that title, try again"
+            sleep(2)
             self.search_for_movie
         end
     end
 
     def create_movie
         puts "What is the name of the movie you would like to create?"
-        movie = gets.chomp.to_s
+        new_movie = gets.chomp.to_s
         puts "And what would you like to rate this movie?(1-5)"
         rating = rate()
         choice = @@prompt.select("Are you sure?", %w(Yes No Menu))
         case choice
         when "Yes"
-            if !Movie.all.any?{|movie| movie.title == movie}
+            if !Movie.all.any?{|movie| movie.title == new_movie}
                 new_movie = Movie.create(title: movie)
                 Rating.create(user: @@user, movie: new_movie, rating: rating)
                 spinner
@@ -153,7 +155,7 @@ class CLI
                 puts "Taking you back to the main menu.."
                 sleep (2)
                 main_menu
-            else
+            else Movie.all.any?{|movie| movie.title == new_movie}
                 spinner
                 puts "This movie already exists in our list, please use search function"
                 puts "Taking you back to the main menu"
@@ -176,10 +178,12 @@ class CLI
         if !@@user.movies.empty?
             puts "Here are the movies you have rated already"
             spinner
-            rated_movies = @@user.movies.map do |movie| 
+            rated_movies = @@user.movies.map do |movie|
                 "#{movie.title} - rated #{movie.ratings.find_by(user: @@user, movie: movie).rating}"
             end
             rated_movies << "back"
+            system('clear')
+            logo
             selection = @@prompt.select("Please choose which movies rating you'd like to update", (rated_movies))
             if selection == "back"
                 spinner
