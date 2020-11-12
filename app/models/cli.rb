@@ -105,13 +105,20 @@ class CLI
             selection = @@prompt.select("(Don't see the movie you're looking for? Add it to our list from the main menu!)", (movies.map{|movie|movie.title}), per_page: 10)
             selection = Movie.find_by_title(selection)
             if !@@user.ratings.any?{|rating| rating.movie == selection}
-                puts "What is the rating for this movie? (Ratings are scaled 1-5)"
-                rating = rate()
-                Rating.create({user: @@user, movie: selection, rating: rating})
-                puts "Your movie has been added to your list of Rated Movies"
-                sleep (2)
-                puts "Taking you back to the main menu.."
-                main_menu
+                choice = @@prompt.select("Would you like to rate this movie?", %w(Yes No))
+                if choice == "Yes"
+                    puts "What is the rating for this movie? (Ratings are scaled 1-5)"
+                    rating = rate()
+                    Rating.create({user: @@user, movie: selection, rating: rating})
+                    puts "Your movie has been added to your list of Rated Movies"
+                    sleep (2)
+                    puts "Taking you back to the main menu.."
+                    main_menu
+                else choice == "No"
+                    puts "OK. Taking you back to the main menu.."
+                    sleep(2)
+                    main_menu
+                end
             else
                 puts "You have already rated this movie"
                 choice = @@prompt.select("Would you like to update your rating?", %w(Yes No))
@@ -148,8 +155,8 @@ class CLI
         case choice
         when "Yes"
             if !Movie.all.any?{|movie| movie.title == new_movie}
-                new_movie = Movie.create(title: movie)
-                Rating.create(user: @@user, movie: new_movie, rating: rating)
+                movie = Movie.create(title: new_movie)
+                Rating.create(user: @@user, movie: movie, rating: rating)
                 spinner
                 puts "Your entry has been added! Thanks for your contribution."
                 puts "Taking you back to the main menu.."
