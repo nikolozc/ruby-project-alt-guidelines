@@ -20,7 +20,7 @@ class CLI
     def welcome
         system('clear')
         logo
-        #sleep(2)
+        #binding.pry
         display_menu = @@prompt.select("Welcome! Please Log In or Signup.", %w(Login Signup))
         case display_menu
         when "Login"
@@ -60,8 +60,8 @@ class CLI
             sleep(2)
             welcome
          else user != User.find_by(username: username)
+            user = User.create(username: username, password: password)
             @@user = user
-            @@user = User.create(username: @username, password: password)
             spinner
             puts "Welcome #{username} and thanks for joining!"
             sleep(2)
@@ -272,27 +272,36 @@ class CLI
 
     def delete_all_ratings
         puts @@pastel.red("THIS IS THE DANGER ZONE")
-        selection = @@prompt.select("Are you sure you'd like to delete ALL ratings?", %w(Yes No))
-            if selection == "Yes"
+        if !@@user.movies.empty?
+            selection = @@prompt.select("Are you sure you'd like to delete ALL ratings?", %w(Yes No))
+                if selection == "Yes"
                 choice = @@prompt.select("Are you DEFINITELY SURE?", %w(Yes No))
-                if choice == "Yes"
-                    @@user.ratings.destroy_all
-                    spinner
-                    puts "All ratings have been deleted."
-                    puts "Taking you back to the main menu to create some more!"
-                    sleep(2)
-                    main_menu
-                else choice == "No"
-                    puts "Whew, that was close!"
-                    puts "Taking you back to the main menu.."
+                    if choice == "Yes"
+                        @@user.ratings.destroy_all
+                        spinner
+                        puts "All ratings have been deleted."
+                        puts "Taking you back to the main menu to create some more!"
+                        sleep(2)
+                        main_menu
+                    else choice == "No"
+                        puts "Whew, that was close!"
+                        puts "Taking you back to the main menu.."
+                        sleep(2)
+                        main_menu
+                    end
+                else selection == "No"
+                    puts "OK. Taking you back to the main menu.."
                     sleep(2)
                     main_menu
                 end
-            else selection == "No"
-                puts "OK. Taking you back to the main menu.."
-                sleep(2)
-                main_menu
-            end
+        else
+            spinner
+            puts "You haven't rated any movies yet"
+            sleep (2)
+            puts "Taking you back to the main menu.."
+            sleep(2)
+            main_menu
+        end 
     end
 
     def logout
