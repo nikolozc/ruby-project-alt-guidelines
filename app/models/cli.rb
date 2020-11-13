@@ -67,14 +67,14 @@ class CLI
         system('clear')
         logo
         @@user.reload
-        choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already", "Delete Rating(s)", "See a random movie", "DELETE ALL RATINGS", "Logout"]
+        choices = ["Search for a movie to review", "Add a movie to our list", "See what movies you have rated already / Update Ratings", "Delete Rating(s)", "See a random movie", "DELETE ALL RATINGS", "Logout"]
         selection = @@prompt.select("What would you like to do today?", choices)
         case selection
         when "Search for a movie to review"
             self.search_for_movie
         when "Add a movie to our list"
             self.create_movie
-        when "See what movies you have rated already"
+        when "See what movies you have rated already / Update Ratings"
             self.rated_movies
         when "Delete Rating(s)"
             self.delete_rating
@@ -143,13 +143,15 @@ class CLI
     def create_movie
         puts "What is the name of the movie you would like to create?"
         new_movie = gets.chomp.to_s
+        puts "When was this movie released? (ex: July 23rd, 2009)"
+        release_date = gets.chomp.to_s
         puts "And what would you like to rate this movie?(1-5)"
         rating = rate()
         choice = @@prompt.select("Are you sure?", %w(Yes No Menu))
         case choice
         when "Yes"
             if !Movie.all.any?{|movie| movie.title == new_movie}
-                movie = Movie.create(title: new_movie)
+                movie = Movie.create(title: new_movie, release_date: release_date)
                 Rating.create(user: @@user, movie: movie, rating: rating)
                 spinner
                 puts "Your entry has been added! Thanks for your contribution."
