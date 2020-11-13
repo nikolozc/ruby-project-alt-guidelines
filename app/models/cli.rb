@@ -27,7 +27,7 @@ class CLI
     def login
         system('clear')
         logo
-        username = @@prompt.ask("Please enter a username").capitalize
+        username = @@prompt.ask("Please enter a username").strip.capitalize
         password = @@prompt.mask("Please enter password (0-9)")
         if user = User.find_by(username: username, password: password)
             @@user = user
@@ -167,6 +167,7 @@ class CLI
             puts "Lets try that again.."
             sleep(2)
             system('clear')
+            logo
             create_movie
         when "Menu"
             puts "Taking you back to the main menu.."
